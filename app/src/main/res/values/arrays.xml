@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name = "store_info">
+        <item>南機場</item>
+        <item>忠孝ＳＯＧＯ</item>
+        <item>衡陽</item>
+        <item>南陽</item>
+        <item>汀州</item>
+        <item>臺北錦州</item>
+
+    </string-array>
+
+
+</resources>
