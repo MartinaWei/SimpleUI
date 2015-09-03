@@ -18,6 +18,7 @@ public class DrinkMenuActivity extends AppCompatActivity {
         storeInfo = (TextView) findViewById(R.id.storeinfo);
 
         String storeInfoStr = getIntent().getStringExtra("store_info");
+        storeInfo.setText(storeInfoStr);
     }
 
     @Override
