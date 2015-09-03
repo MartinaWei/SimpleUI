@@ -1,6 +1,7 @@
 package com.caece.simpleui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -107,6 +108,20 @@ public class MainActivity extends AppCompatActivity {
         loadHistory();
 
     }
+
+    public void toDrinkMenu (View view){
+
+        String storeInfoString = (String) storeInfo.getSelectedItem();
+        Intent intent = new Intent();//jump? opento?
+        intent.setClass(this, DrinkMenuActivity.class);
+        intent.putExtra("store_info", storeInfoString);
+        startActivity(intent);
+
+    }
+
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
