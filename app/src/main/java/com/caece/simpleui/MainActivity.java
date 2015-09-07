@@ -19,6 +19,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_DRINK_MENU = 1;
     //
@@ -29,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
+
+    private String drinkMenuResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +101,23 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private JSONObject pack(){
+        try{
+            JSONObject object = new JSONObject();
+            object.put("note", inputText.getText().toString());
+            object.put("store_info", (String) storeInfo.getSelectedItem());
+            if (drinkMenuResult != null){
+                object.put("menu", new JSONArray(drinkMenuResult));
+                return object;
+            }
+            object.put("menu", new JSONArray(drinkMenuResult));
+            return object;
+        }catch ( JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     public void submit (View view) { //1.must be public 2. only one mariable ,type:view
         String text =  inputText.getText().toString();
@@ -106,8 +129,11 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, text, Toast.LENGTH_SHORT).show();//this is the activity
         }
 
-        Utils.writeFile(this,"history.txt",text+"\n");
+        Utils.writeFile(this,"history.txt",pack().toString()+"\n");
         loadHistory();
+
+        inputText.setText("");
+        drinkMenuResult = null;
 
     }
 
@@ -125,8 +151,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) { // requestcode:know which method back
         if (requestCode == REQUEST_DRINK_MENU)
             if(resultCode == RESULT_OK){
-                String result = data.getStringExtra("result");
-                Log.d("debug", result);
+                drinkMenuResult = data.getStringExtra("result");
+                Log.d("debug", drinkMenuResult);
             }
 
     }
