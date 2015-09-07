@@ -1,12 +1,20 @@
 package com.caece.simpleui;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class DrinkMenuActivity extends AppCompatActivity {
 
@@ -29,9 +37,47 @@ public class DrinkMenuActivity extends AppCompatActivity {
         button.setText(String.valueOf(count + 1));
     }
 
-    public void done (View view){
-        finish();
+    private JSONArray getValue(){
+
+        JSONArray result = new JSONArray();
+        LinearLayout root = (LinearLayout) findViewById(R.id.root);
+
+        root.getChildAt(1);
+        root.getChildAt(2);
+
+        int len = root.getChildCount();
+        for (int i=1; i<len-1; i++){
+
+            LinearLayout ll = (LinearLayout) root.getChildAt(i);
+            String name = ((TextView)ll.getChildAt(0)).getText().toString();//drink name
+            int l = Integer.valueOf(((Button) ll.getChildAt(1)).getText().toString());
+            int m = Integer.valueOf(((Button) ll.getChildAt(2)).getText().toString());
+
+            try {
+                JSONObject object = new JSONObject();
+                object.put("name", name);
+                object.put("l", l);
+                object.put("m", m);
+                result.put(object);
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+
+        }
+        return result;
+
     }
+    public void done (View view){
+
+        Log.d("debug", getValue().toString());
+
+        Intent data = new Intent();
+        data.putExtra("result", getValue().toString());
+        setResult(RESULT_OK,data); // sent data to main activity
+
+        this.finish();//finish();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

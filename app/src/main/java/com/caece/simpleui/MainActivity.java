@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_DRINK_MENU = 1;
     //
     private EditText inputText;
     private CheckBox hide;
@@ -115,13 +117,19 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent();//jump? opento?
         intent.setClass(this, DrinkMenuActivity.class);
         intent.putExtra("store_info", storeInfoString);
-        startActivity(intent);
+        startActivityForResult(intent,REQUEST_DRINK_MENU);
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) { // requestcode:know which method back
+        if (requestCode == REQUEST_DRINK_MENU)
+            if(resultCode == RESULT_OK){
+                String result = data.getStringExtra("result");
+                Log.d("debug", result);
+            }
 
-
-
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
