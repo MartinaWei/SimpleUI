@@ -20,11 +20,18 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.parse.Parse;
+import com.parse.ParseObject;
+
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +52,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState); // initialize
         setContentView(R.layout.activity_main);
+
+        // Enable Local Datastore.
+        Parse.enableLocalDatastore(this);
+        Parse.initialize(this, "z10MwinJq8BEBMdsX4VLIqlNmwnB4uXSEW3KKEsD", "yWIk3us2tuffEGFModKzZPBPqjmwJflDGRTH0T2Y");
+
 
         sp = getSharedPreferences("settings", Context.MODE_PRIVATE);//read
         editor =sp.edit(); //write
@@ -101,27 +113,26 @@ public class MainActivity extends AppCompatActivity {
         //history.setText(result);
         String[] rawData = result.split("\n");
 
-        List<Map<String, String>> data = new ArrayList<>();
-        for (int i=0; i< rawData.length;i++) {
-            try{
+        List<Map<String, String>> data = new ArrayList<Map<String, String>>();
+        for (int i = 0; i < rawData.length; i++) {
+            try {
                 JSONObject object = new JSONObject(rawData[i]);
                 String note = object.getString("note");
                 String storeInfo = object.getString("store_info");
                 JSONArray menu = object.getJSONArray("menu");
 
-                Map<String, String> item = new HashMap<>();
-                item.put("note", note);
+                Map<String, String> item = new HashMap<String, String>();
+                item.put("note", note);//map key
                 item.put("store_info", storeInfo);
                 item.put("sum", "5");
 
                 data.add(item);
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        String[] from = new String[]{"note", "store_info", "sum"};
-        int[] to = new int[] {R.id.note, R.id.store_info, R.id.sum};
+        String[] from = new String[]{"note", "store_info", "sum"}; //map key-> layout id
+        int[] to = new int[] {R.id.note, R.id.store_info, R.id.sum};//in order
         SimpleAdapter adapter = new SimpleAdapter(this, data, R.layout.listview_item, from, to);
 
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data); // make a adapter
