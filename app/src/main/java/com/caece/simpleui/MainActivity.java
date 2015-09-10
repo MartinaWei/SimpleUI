@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "z10MwinJq8BEBMdsX4VLIqlNmwnB4uXSEW3KKEsD", "yWIk3us2tuffEGFModKzZPBPqjmwJflDGRTH0T2Y");
 
+        ParseObject testObject = new ParseObject("TestObject");
+        testObject.put("foo", "bar");
+        testObject.saveInBackground();
 
         sp = getSharedPreferences("settings", Context.MODE_PRIVATE);//read
         editor =sp.edit(); //write
@@ -150,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 object.put("menu", new JSONArray(drinkMenuResult));
                 return object;
             }
-            object.put("menu", new JSONArray(drinkMenuResult));
+            //object.put("menu", new JSONArray(drinkMenuResult));
             return object;
         }catch ( JSONException e) {
             e.printStackTrace();
@@ -159,12 +162,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     public void submit (View view) { //1.must be public 2. only one mariable ,type:view
         String text =  inputText.getText().toString();
         if (hide.isChecked()){
             text="*******";
         }
-        inputText.setText("");
+        //inputText.setText("");
         if (!text.isEmpty()) {
             Toast.makeText(this, text, Toast.LENGTH_SHORT).show();//this is the activity
         }
