@@ -108,9 +108,23 @@ public class MainActivity extends AppCompatActivity {
     //lv1
 
     private  void loadStoreInfo(){
-        String[] data =getResources().getStringArray(R.array.store_info); // {"台大店","師大店","西門店"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,data);
-        storeInfo.setAdapter(adapter);
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("StoreInfo");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                String[] data = new String[list.size()];
+                for (int i = 0; i < list.size(); i++) {
+                    ParseObject object = list.get(i);
+                    data[i] = object.getString("name") + " " + object.getString("address");
+                }
+
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, data);
+                storeInfo.setAdapter(adapter);
+            }
+        });
+        //String[] data =getResources().getStringArray(R.array.store_info); // {"台大店","師大店","西門店"};
+
 
     }
 
