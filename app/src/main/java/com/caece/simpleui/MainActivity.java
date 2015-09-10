@@ -21,8 +21,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.parse.FindCallback;
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 
 import org.json.JSONArray;
@@ -58,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
         Parse.initialize(this, "z10MwinJq8BEBMdsX4VLIqlNmwnB4uXSEW3KKEsD", "yWIk3us2tuffEGFModKzZPBPqjmwJflDGRTH0T2Y");
 
         ParseObject testObject = new ParseObject("TestObject");
-        testObject.put("foo", "bar");
-        testObject.saveInBackground();
+        //testObject.put("foo", "bar");
+        //testObject.saveInBackground();
 
         sp = getSharedPreferences("settings", Context.MODE_PRIVATE);//read
         editor =sp.edit(); //write
@@ -96,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         storeInfo = (Spinner) findViewById(R.id.spinner);
 
         loadHistory();
-        loadStoreInfo();;
+        loadStoreInfo();
     }
 
     //lv3
@@ -110,38 +114,50 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void loadHistory(){
-        String result = Utils.readFile(this, "history.txt");
-        //TextView history = (TextView) findViewById(R.id.history);
-        //history.setText(result);
-        String[] rawData = result.split("\n");
+    private void loadHistory() {
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Order");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                if (e == null) {
+                    List<Map<String, String>> data = new ArrayList<Map<String, String>>();
+                    for (int i = 0; i < list.size(); i++) {
+                        ParseObject object = list.get(i);
+                        String note = object.getString("note");
+                        String storeInfo = object.getString("store_info");
+                        JSONArray menu = object.getJSONArray("menu");
 
-        List<Map<String, String>> data = new ArrayList<Map<String, String>>();
-        for (int i = 0; i < rawData.length; i++) {
+                        Map<String, String> item = new HashMap<String, String>();
+                        item.put("note", note);
+                        item.put("store_info", storeInfo);
+                        item.put("sum", "5");
+
+                        data.add(item);
+                    }
+                    String[] from = new String[]{"note", "store_info", "sum"};
+                    int[] to = new int[]{R.id.note, R.id.store_info, R.id.sum};
+                    SimpleAdapter adapter = new SimpleAdapter(MainActivity.this,
+                            data, R.layout.listview_item, from, to);
+
+                    history.setAdapter(adapter);
+                }
+            }
+        });
+
+    }
+
+    private void saveOrder(SaveCallback saveCallback){
+        ParseObject object = new ParseObject("Order");
+        object.put("note",inputText.getText().toString());
+        object.put("store_info", (String) storeInfo.getSelectedItem());
+        if (drinkMenuResult != null){
             try {
-                JSONObject object = new JSONObject(rawData[i]);
-                String note = object.getString("note");
-                String storeInfo = object.getString("store_info");
-                JSONArray menu = object.getJSONArray("menu");
-
-                Map<String, String> item = new HashMap<String, String>();
-                item.put("note", note);//map key
-                item.put("store_info", storeInfo);
-                item.put("sum", "5");
-
-                data.add(item);
+                object.put("menu", new JSONArray(drinkMenuResult));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        String[] from = new String[]{"note", "store_info", "sum"}; //map key-> layout id
-        int[] to = new int[] {R.id.note, R.id.store_info, R.id.sum};//in order
-        SimpleAdapter adapter = new SimpleAdapter(this, data, R.layout.listview_item, from, to);
-
-        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data); // make a adapter
-        history.setAdapter(adapter);//adapter
-
-
+        object.saveInBackground(saveCallback);//better than not in back
     }
 
     private JSONObject pack(){
@@ -173,8 +189,14 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, text, Toast.LENGTH_SHORT).show();//this is the activity
         }
 
-        Utils.writeFile(this,"history.txt",pack().toString()+"\n");
-        loadHistory();
+        //Utils.writeFile(this, "history.txt", pack().toString() + "\n");
+        saveOrder(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                loadHistory();
+            }
+        });
+
 
         inputText.setText("");
         drinkMenuResult = null;
