@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
 
     private String drinkMenuResult;
+    private List<ParseObject> orderResult;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +104,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //viwe = item (littel)
-                goToOrderDetail();
+                goToOrderDetail(position);//can by view or id or positon
+
 
             }
         });
@@ -144,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
                 if (e == null) {
+                    orderResult = list;
                     List<Map<String, String>> data = new ArrayList<Map<String, String>>();
                     for (int i = 0; i < list.size(); i++) {
                         ParseObject object = list.get(i);
@@ -201,9 +205,14 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    private void goToOrderDetail(){
+    private void goToOrderDetail(int position){
+        ParseObject order = orderResult.get(position);
+
         Intent intent = new Intent();
         intent.setClass(this, OrderDetailActivity.class);
+        intent.putExtra("note", order.getString("note"));
+        intent.putExtra("store_info",order.getString("store_info"));
+        intent.putExtra("menu", order.getJSONArray("menu").toString());
         startActivity(intent);
     }
 
