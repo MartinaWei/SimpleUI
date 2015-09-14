@@ -3,6 +3,7 @@ package com.caece.simpleui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,6 +43,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_DRINK_MENU = 1;
+    private  static final int REQUESST_TAKE_PHOTO = 2;
     //
     private EditText inputText;
     private CheckBox hide;
@@ -258,6 +260,8 @@ public class MainActivity extends AppCompatActivity {
             if(resultCode == RESULT_OK){
                 drinkMenuResult = data.getStringExtra("result");
                 Log.d("debug", drinkMenuResult);
+            }else if (requestCode == REQUESST_TAKE_PHOTO){
+
             }
 
     }
@@ -278,7 +282,11 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_take_photo) {
-            Toast.makeText(this,"take photo", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this,"take photo", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent();
+            intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE); // find app to take shot
+
+            startActivityForResult(intent,REQUESST_TAKE_PHOTO ); //call directly
             return true;
         }
 
