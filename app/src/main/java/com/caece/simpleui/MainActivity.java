@@ -3,6 +3,8 @@ package com.caece.simpleui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
@@ -26,6 +29,7 @@ import android.widget.Toast;
 import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
@@ -43,12 +47,13 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_DRINK_MENU = 1;
-    private  static final int REQUESST_TAKE_PHOTO = 2;
+    private static final int REQUEST_TAKE_PHOTO = 2;
     //
     private EditText inputText;
     private CheckBox hide;
     private ListView history; //realbody
     private Spinner storeInfo;
+    private ImageView imageView;
 
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
@@ -56,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private String drinkMenuResult;
     private List<ParseObject> orderResult;
 
-
+    private boolean hasPhoto = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState); // initialize
@@ -113,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         storeInfo = (Spinner) findViewById(R.id.spinner);
+        imageView = (ImageView)findViewById(R.id.imageView);
 
         loadHistory();
         loadStoreInfo();
@@ -187,6 +193,10 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+        if (hasPhoto) {
+            ParseFile file = new ParseFile("photo.png", Utils.uriToBytes(this, Utils.getPhotoUri()));
+            object.put("photo", file);
+                    }
         object.saveInBackground(saveCallback);//better than not in back
     }
 
@@ -241,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
 
         inputText.setText("");
         drinkMenuResult = null;
+        hasPhoto = false;
 
     }
 
@@ -255,15 +266,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) { // requestcode:know which method back
-        if (requestCode == REQUEST_DRINK_MENU)
-            if(resultCode == RESULT_OK){
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_DRINK_MENU) {
+            if (resultCode == RESULT_OK) {
                 drinkMenuResult = data.getStringExtra("result");
                 Log.d("debug", drinkMenuResult);
-            }else if (requestCode == REQUESST_TAKE_PHOTO){
-
             }
-
+        } else if (requestCode == REQUEST_TAKE_PHOTO) {
+            if (resultCode == RESULT_OK) {
+                //Bitmap bm = data.getParcelableExtra("data");
+                //imageView.setImageBitmap(bm);
+                Uri uri = Utils.getPhotoUri();
+                imageView.setImageURI(uri);
+                hasPhoto=true;
+            }
+        }
     }
 
     @Override
@@ -285,8 +302,9 @@ public class MainActivity extends AppCompatActivity {
             //Toast.makeText(this,"take photo", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent();
             intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE); // find app to take shot
+            intent.putExtra(MediaStore.EXTRA_OUTPUT,Utils.getPhotoUri());
 
-            startActivityForResult(intent,REQUESST_TAKE_PHOTO ); //call directly
+            startActivityForResult(intent, REQUEST_TAKE_PHOTO); //call directly
             return true;
         }
 
