@@ -5,17 +5,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 public class OrderDetailActivity extends AppCompatActivity {
 
     private TextView textView;
+    private WebView webView;
+    /* geo point double array */
+    private double[] geoPoint;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_detail);
-        
-        textView = ( TextView) findViewById(R.id.textView);
+
+        textView = (TextView) findViewById(R.id.textView);
+        webView = (WebView) findViewById(R.id.webView);
 
         Intent intent = getIntent();
         String note = intent.getStringExtra("note");
@@ -23,7 +29,35 @@ public class OrderDetailActivity extends AppCompatActivity {
         String menu = intent.getStringExtra("menu");
 
         textView.setText(note + "," + storeInfo + "," + menu);
+        /*call load geo point function*/
+        loadGeoPoint(storeInfo);
+        loadWebView();
     }
+
+    private final static String STATIC_MAP_URL = "https://maps.googleapis.com/maps/api/staticmap?";
+
+    private void loadWebView() {
+
+        String url = "https://maps.googleapis.com/maps/api/staticmap?center=25.020384,%20121.544608&zoom=15&size=600x300";
+        webView.loadUrl(url);
+    }
+
+    /* declare load geo point function */
+    private void loadGeoPoint(String storeInfo) {
+        String geoQueryUrl = Utils.getGeoQueryUrl(storeInfo);
+        Utils.NetworkTask task = new Utils.NetworkTask();
+        task.setCallback(new Utils.NetworkTask.Callback() {
+            @Override
+            public void done(byte[] fetchResult) {
+                String jsonString = new String(fetchResult);
+                geoPoint = Utils.getGeoPoint(jsonString);
+                textView.setText("lat: " + geoPoint[0]
+                        + ", lng: " + geoPoint[1]);
+            }
+        });
+        task.execute(geoQueryUrl);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
