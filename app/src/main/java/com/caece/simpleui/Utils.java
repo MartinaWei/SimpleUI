@@ -1,10 +1,13 @@
 package com.caece.simpleui;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,6 +44,26 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static int getSum(JSONArray menu) throws JSONException {
+        //JSONArray jsonArray = new JSONArray(menu);
+
+        int Sum = 0;
+
+        //int num = new menu.getJSONObject(0).getInt("l");
+        //for( int i=0; i<menu.length(); i++) {
+            //JSONObject jsonObject = menu.optJSONObject(i);
+            //String num = jsonObject.optString("l");
+            //n = n+num;
+            //num = jsonObject.optInt("m");
+            //n = n+num;
+            //sum = sum + menu.getJSONObject(i).getInt("l");
+            //sum = sum + menu.getJSONObject(i).getInt("m");
+        //}
+        return Sum;
 
     }
 

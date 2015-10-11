@@ -78,6 +78,12 @@ public class DrinkMenuActivity extends AppCompatActivity {
         this.finish();//finish();
     }
 
+    public void cancel (View view){
+
+        Intent back = new Intent();
+        this.finish();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

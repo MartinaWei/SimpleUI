@@ -1,13 +1,14 @@
 package com.caece.simpleui;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -22,9 +23,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -34,14 +33,12 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -69,10 +66,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Enable Local Datastore.
         Parse.enableLocalDatastore(this);
+        //hw
+         //Parse.initialize(this, "N5ytfpTopfdCCmIqCgZZk5PDjkUiGudm1UaygmOv", "TH9KM8xYSN4nFD7GIxGDrppNsXVN1exKrm0v6KuA");
+        //my
         Parse.initialize(this, "z10MwinJq8BEBMdsX4VLIqlNmwnB4uXSEW3KKEsD", "yWIk3us2tuffEGFModKzZPBPqjmwJflDGRTH0T2Y");
 
-        ParseObject testObject = new ParseObject("TestObject");
-        //testObject.put("foo", "bar");
+        ParseObject HomeworkParse = new ParseObject("HomeworkParse");
+        HomeworkParse.put("sid", "AND26017");
+        HomeworkParse.put("email","xxxxxtsuki@gmail.com");
+        HomeworkParse.saveInBackground();
         //testObject.saveInBackground();
 
         sp = getSharedPreferences("settings", Context.MODE_PRIVATE);//read
@@ -101,10 +103,17 @@ public class MainActivity extends AppCompatActivity {
         hide.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
                 editor.putBoolean("hide", isChecked);
+                if (hide.isChecked()){
+                imageView.setVisibility(View.INVISIBLE);}
+                else{
+                    imageView.setVisibility(View.VISIBLE);
+                }
                 editor.commit();
             }
         });
+
         hide.setChecked(sp.getBoolean("hide", false));
         history = (ListView) findViewById(R.id.history);
         history.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -152,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
     private void loadHistory() {
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Order");
         query.findInBackground(new FindCallback<ParseObject>() {
+            @TargetApi(Build.VERSION_CODES.KITKAT)
             @Override
             public void done(List<ParseObject> list, ParseException e) {
                 if (e == null) {
@@ -161,12 +171,27 @@ public class MainActivity extends AppCompatActivity {
                         ParseObject object = list.get(i);
                         String note = object.getString("note");
                         String storeInfo = object.getString("store_info");
-                        JSONArray menu = object.getJSONArray("menu");
+                        //JSONArray menu = object.getJSONArray("menu");
+                        JSONArray test = object.getJSONArray("menu");
+                        try {
+                            JSONObject jsonObject = test.getJSONObject(0);
+                        } catch (JSONException e1) {
+                            e1.printStackTrace();
+                        }
+
+
+                        JSONObject temp = new JSONObject();//menu.optJSONObject(0);
+
+
+                        int sum = 0;
+
+
+                        String total = sum+"";
 
                         Map<String, String> item = new HashMap<String, String>();
                         item.put("note", note);
                         item.put("store_info", storeInfo);
-                        item.put("sum", "5");
+                        item.put("sum", total);
 
                         data.add(item);
                     }
@@ -234,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
         String text =  inputText.getText().toString();
         if (hide.isChecked()){
             text="*******";
+
         }
         //inputText.setText("");
         if (!text.isEmpty()) {
